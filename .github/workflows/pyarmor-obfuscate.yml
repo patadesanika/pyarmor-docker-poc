@@ -38,15 +38,14 @@ jobs:
       - name: Obfuscate Python Code
         run: |
           echo "Starting obfuscation..."
-          # Use the --ci flag to explicitly tell Pyarmor this is CI/CD
-          pyarmor gen --ci -O dist src/
+          export PYARMOR_CI=1
+          pyarmor gen -O dist src/
           
           echo "Obfuscation complete!"
           ls -la dist/
       
       - name: Test Obfuscated Code
         run: |
-          echo "Testing obfuscated code..."
           cd dist
           python main.py
       

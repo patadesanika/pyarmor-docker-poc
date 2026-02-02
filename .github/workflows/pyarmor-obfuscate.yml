@@ -34,9 +34,9 @@ jobs:
 
       - name: Obfuscate Source Code
         run: |
-          # Obfuscate the entire src folder
-          # -r: recursive, -o: output directory
-          pyarmor gen -r -o dist/ src/
+          # Use -O (uppercase) for the output directory in Pyarmor 9.x
+          # This will obfuscate everything in the src directory
+          pyarmor gen -O dist/ src/
 
       - name: Upload Obfuscated Artifacts
         uses: actions/upload-artifact@v4

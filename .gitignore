@@ -1,0 +1,23 @@
+# Virtual environments
+venv/
+.env/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Docker
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# VS Code
+.vscode/
+
+# Other
+*.DS_Store

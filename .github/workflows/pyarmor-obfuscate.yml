@@ -11,6 +11,11 @@ jobs:
   obfuscate:
     runs-on: ubuntu-latest
     
+    # Add these environment variables to tell Pyarmor it's in CI/CD
+    env:
+      CI: true
+      GITHUB_ACTIONS: true
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,6 +46,13 @@ jobs:
           
           echo "Cleaning up license file..."
           rm pyarmor-ci.zip
+      
+      - name: Verify CI Environment
+        run: |
+          echo "CI Environment Variables:"
+          echo "CI=$CI"
+          echo "GITHUB_ACTIONS=$GITHUB_ACTIONS"
+          echo "RUNNER_OS=$RUNNER_OS"
       
       - name: Obfuscate Python Code
         run: |

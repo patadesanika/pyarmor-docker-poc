@@ -1,0 +1,81 @@
+Dear YASH Technologies Pvt. Ltd.，
+
+Thank you for purchasing Pyarmor CI License, here it is activation code for license no. "pyarmor-vax-8153"
+
+yU6LFbeJu3nidMX7UIWC69P3t7RmfydRNNMUyjLu-bWichP8nhZpgIYMoArNHsyG8ohAtmK8Nqk_NQEm4Gybio7mlqgnPML4Yeh-jv54pjdx4BxucVmevhL9hLAdRMunS-K9DpRQCKvZ2LNeR49d7d4awGKu31yaPj66GYCX5N4QLk-YEz2R4dI7GwKmWHVV
+
+Internet connection and Pyarmor 9.0+ are required to activate this code, install Pyarmor and check Pyarmor version by this command
+
+    pip install -U pyarmor
+    pyarmor -v
+
+Here are initial registration steps:
+
+1. Download the attachment of this email, save it as "pyarmor-regcode-8153.txt"
+
+2. Run the following command to activate this license, please replace "XXX" with your product name which need to be obfuscated by Pyarmor or "non-profits" (only for obfuscating non-commercial projects)
+
+     pyarmor reg -p XXX pyarmor-regcode-8153.txt
+
+3. The registration file "pyarmor-regfile-8153.zip" will be created in the current path if this license is activated sucessfully
+
+IMPORTANT NOTES:
+
+* Please backup "pyarmor-regcode-8153.txt", but do not use it to register Pyarmor
+* Please backup regfile "pyarmor-regfile-8153.zip", and use this file for next any registration
+* Do not use this file in docker container and CI/CD pipeline
+* Pyarmor Team doesn't provide LOST FOUND SERVICE
+
+CI License only works in CI/CD pipeline, "pyarmor-regfile-8153.zip" is only used to request CI regfile, it doesn't work in local machine to register Pyarmor
+
+- In local device run the following command to request one CI regfile
+
+      pyarmor reg -C pyarmor-regfile-8153.zip
+
+  It will create one CI regfile "pyarmor-ci-8153.zip" in the current path
+
+  Check CI license info in local machine
+
+      pyarmor --home temp reg pyarmor-ci-8153.zip
+
+- In CI/CD pipeline, register Pyarmor by CI regfile
+
+      # Please replace "9.X.Y" with current Pyarmor version
+      pip install pyarmor==9.X.Y
+      pyarmor reg pyarmor-ci-8153.zip
+
+  Check registration information in CI/CD pipeline
+
+      pyarmor -v
+
+Notes
+
+* CI regfile "pyarmor-ci-8153.zip" will be expired about in 360 days
+* Once CI regfile doesn't work, require new one
+* CI regfile may not work in future Pyarmor version
+* One license can request at most 100 CI regfiles
+* Do not request CI regfile in CI/CD pipeline
+
+In CI/CD pipeline, each run command `pyarmor gen` will send request to Pyarmor License Server, excessive requests or requests beyond normal usage may be rejected by Pyarmor License Server. Generally do not exceed any of these rate limits:
+
+- 1 run per second
+- 100 runs per hour
+- 1,000 runs per day
+- 10,000 runs per month
+
+Please contact Pyarmor team (pyarmor@163.com) if your project need more runs.
+
+More information about CI license, refer to
+
+    https://pyarmor.readthedocs.io/en/latest/how-to/ci.html
+
+Pyarmor is well document, here is online documentation
+
+    https://pyarmor.readthedocs.io/en/latest/
+
+If there is any question, check this page for the solutions
+
+    https://pyarmor.readthedocs.io/en/latest/questions.html
+
+Best Regards
+Pyarmor Team

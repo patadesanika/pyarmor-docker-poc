@@ -34,10 +34,10 @@ jobs:
 
       - name: Generate Single-File Executable
         run: |
-          # --pack onefile: Bundles everything into one executable
-          # -O: Output directory
-          # We point to src/main.py as the entry point
-          pyarmor gen --pack onefile -O dist/ src/main.py
+          # Automatically find the file containing "if __name__ == '__main__':"
+          ENTRY_POINT=$(grep -l "if __name__ == \"__main__\":" src/*.py | head -n 1)
+          echo "Found entry point: $ENTRY_POINT"
+          pyarmor gen --pack onefile -O dist/ "$ENTRY_POINT"
 
       - name: Test Obfuscated Executable
         run: |

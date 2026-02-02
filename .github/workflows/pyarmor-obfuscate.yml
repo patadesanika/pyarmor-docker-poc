@@ -5,16 +5,11 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:  # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   obfuscate:
     runs-on: ubuntu-latest
-    
-    # Add these environment variables to tell Pyarmor it's in CI/CD
-    env:
-      CI: true
-      GITHUB_ACTIONS: true
     
     steps:
       - name: Checkout code
@@ -28,7 +23,6 @@ jobs:
       - name: Install Pyarmor
         run: |
           pip install pyarmor==9.2.3
-          echo "Pyarmor installed successfully"
           pyarmor --version
       
       - name: Setup Pyarmor CI License
@@ -37,30 +31,17 @@ jobs:
         run: |
           echo "Setting up CI license..."
           echo "$PYARMOR_CI_LICENSE" | base64 -d > pyarmor-ci.zip
-          
-          echo "Registering license..."
           pyarmor reg pyarmor-ci.zip
-          
-          echo "Verifying registration..."
           pyarmor -v
-          
-          echo "Cleaning up license file..."
           rm pyarmor-ci.zip
-      
-      - name: Verify CI Environment
-        run: |
-          echo "CI Environment Variables:"
-          echo "CI=$CI"
-          echo "GITHUB_ACTIONS=$GITHUB_ACTIONS"
-          echo "RUNNER_OS=$RUNNER_OS"
       
       - name: Obfuscate Python Code
         run: |
           echo "Starting obfuscation..."
-          pyarmor gen -O dist src/
+          # Use the --ci flag to explicitly tell Pyarmor this is CI/CD
+          pyarmor gen --ci -O dist src/
           
           echo "Obfuscation complete!"
-          echo "Obfuscated files:"
           ls -la dist/
       
       - name: Test Obfuscated Code
@@ -75,9 +56,3 @@ jobs:
           name: obfuscated-code-${{ github.sha }}
           path: dist/
           retention-days: 30
-      
-      - name: Summary
-        run: |
-          echo "✅ Obfuscation completed successfully!"
-          echo "📦 Artifact uploaded: obfuscated-code-${{ github.sha }}"
-          echo "🔗 Download from the Actions tab"

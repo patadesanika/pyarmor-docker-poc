@@ -22,20 +22,25 @@ jobs:
         run: |
           pip install pyarmor==9.2.3
 
+      - name: Prepare CI Environment
+        # This "hides" the disk info so Pyarmor identifies it as a container/CI
+        run: sudo mv /dev/disk /dev/disk-none || true
+
       - name: Authenticate Pyarmor
         env:
-          # Replace PYARMOR_LICENSE_BASE64 with the actual name of your secret in GitHub
-          PYARMOR_LICENSE: ${{ secrets.PYARMOR_CI_LICENSE }}
+          # Use the exact name you saved in GitHub Secrets
+          PYARMOR_LICENSE_B64: ${{ secrets.PYARMOR_CI_LICENSE }}
         run: |
-          # Create a temporary file for the license
-          echo "$PYARMOR_LICENSE" | base64 -d > pyarmor-device-regfile-1.zip
-          # Register the license
-          pyarmor reg pyarmor-device-regfile-1.zip
+          # 1. Decode the CI license back to a zip
+          echo "$PYARMOR_LICENSE_B64" | base64 -d > pyarmor-ci-license.zip
+          
+          # 2. Register with the CI file
+          pyarmor reg pyarmor-ci-license.zip
 
       - name: Obfuscate Source Code
         run: |
-          # Use -O (uppercase) for the output directory in Pyarmor 9.x
-          # This will obfuscate everything in the src directory
+          # -O is the output directory
+          # We point to the 'src' folder which contains main.py and utils.py
           pyarmor gen -O dist/ src/
 
       - name: Upload Obfuscated Artifacts

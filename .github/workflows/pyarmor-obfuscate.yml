@@ -18,33 +18,36 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Pyarmor
+      - name: Install Dependencies
         run: |
-          pip install pyarmor==9.2.3
+          pip install pyarmor==9.2.3 pyinstaller
 
       - name: Prepare CI Environment
-        # This "hides" the disk info so Pyarmor identifies it as a container/CI
         run: sudo mv /dev/disk /dev/disk-none || true
 
       - name: Authenticate Pyarmor
         env:
-          # Use the exact name you saved in GitHub Secrets
           PYARMOR_LICENSE_B64: ${{ secrets.PYARMOR_CI_LICENSE }}
         run: |
-          # 1. Decode the CI license back to a zip
           echo "$PYARMOR_LICENSE_B64" | base64 -d > pyarmor-ci-license.zip
-          
-          # 2. Register with the CI file
           pyarmor reg pyarmor-ci-license.zip
 
-      - name: Obfuscate Source Code
+      - name: Generate Single-File Executable
         run: |
-          # -O is the output directory
-          # We point to the 'src' folder which contains main.py and utils.py
-          pyarmor gen -O dist/ src/
+          # --pack onefile: Bundles everything into one executable
+          # -O: Output directory
+          # We point to src/main.py as the entry point
+          pyarmor gen --pack onefile -O dist/ src/main.py
 
-      - name: Upload Obfuscated Artifacts
+      - name: Test Obfuscated Executable
+        run: |
+          echo "Running the single-file binary..."
+          # Make it executable (for Linux runners)
+          chmod +x dist/main
+          ./dist/main
+
+      - name: Upload Single Executable
         uses: actions/upload-artifact@v4
         with:
-          name: obfuscated-app
-          path: dist/
+          name: protected-application
+          path: dist/main  # Or dist/main.exe if running on Windows

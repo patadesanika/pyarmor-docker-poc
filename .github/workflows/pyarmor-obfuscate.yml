@@ -1,9 +1,7 @@
-name: Obfuscate Python Code
+name: Obfuscate with Docker
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
     branches: [ main, master ]
   workflow_dispatch:
 
@@ -15,43 +13,57 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      
-      - name: Install Pyarmor
-        run: |
-          pip install pyarmor==9.2.3
-          pyarmor --version
-      
-      - name: Setup Pyarmor CI License
+      - name: Create CI License file
         env:
           PYARMOR_CI_LICENSE: ${{ secrets.PYARMOR_CI_LICENSE }}
         run: |
-          echo "Setting up CI license..."
           echo "$PYARMOR_CI_LICENSE" | base64 -d > pyarmor-ci.zip
-          pyarmor reg pyarmor-ci.zip
-          pyarmor -v
-          rm pyarmor-ci.zip
       
-      - name: Obfuscate Python Code
+      - name: Create Dockerfile
         run: |
-          echo "Starting obfuscation..."
-          export PYARMOR_CI=1
-          pyarmor gen -O dist src/
+          cat > Dockerfile << 'EOF'
+          FROM python:3.12-slim
           
-          echo "Obfuscation complete!"
-          ls -la dist/
+          WORKDIR /app
+          
+          # Install Pyarmor
+          RUN pip install --no-cache-dir pyarmor==9.2.3
+          
+          # Copy files
+          COPY pyarmor-ci.zip /app/
+          COPY src/ /app/src/
+          
+          # Register license
+          RUN pyarmor reg pyarmor-ci.zip && pyarmor -v
+          
+          # Set CI environment variables
+          ENV CI=true
+          ENV GITHUB_ACTIONS=true
+          ENV PYARMOR_CI=1
+          
+          # Obfuscate
+          RUN pyarmor gen -O dist src/ && ls -la dist/
+          
+          # Test
+          RUN cd dist && python main.py
+          
+          CMD ["/bin/bash"]
+          EOF
       
-      - name: Test Obfuscated Code
+      - name: Build and Extract
         run: |
-          cd dist
-          python main.py
+          docker build -t pyarmor-obfuscate .
+          
+          # Extract obfuscated files
+          docker create --name temp pyarmor-obfuscate
+          docker cp temp:/app/dist ./dist
+          docker rm temp
+          
+          echo "Obfuscated files:"
+          ls -la dist/
       
       - name: Upload Obfuscated Code
         uses: actions/upload-artifact@v4
         with:
-          name: obfuscated-code-${{ github.sha }}
+          name: obfuscated-code
           path: dist/
-          retention-days: 30

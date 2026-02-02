@@ -1,22 +1,45 @@
-name: Obfuscate Locally Then Upload
+name: Pyarmor Obfuscation
 
 on:
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  build:
+  obfuscate:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Note
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Pyarmor
         run: |
-          echo "This workflow expects pre-obfuscated code"
-          echo "Run 'pyarmor gen -O dist src/' locally and commit dist/"
-      
-      - name: Upload Pre-Obfuscated Code
+          pip install pyarmor==9.2.3
+
+      - name: Authenticate Pyarmor
+        env:
+          # Replace PYARMOR_LICENSE_BASE64 with the actual name of your secret in GitHub
+          PYARMOR_LICENSE: ${{ secrets.PYARMOR_CI_LICENSE }}
+        run: |
+          # Create a temporary file for the license
+          echo "$PYARMOR_LICENSE" | base64 -d > pyarmor-device-regfile-1.zip
+          # Register the license
+          pyarmor reg pyarmor-device-regfile-1.zip
+
+      - name: Obfuscate Source Code
+        run: |
+          # Obfuscate the entire src folder
+          # -r: recursive, -o: output directory
+          pyarmor gen -r -o dist/ src/
+
+      - name: Upload Obfuscated Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: obfuscated-code
+          name: obfuscated-app
           path: dist/

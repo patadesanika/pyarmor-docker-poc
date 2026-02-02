@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pyarmor-builder
+  labels:
+    app: pyarmor-builder
+spec:
+  containers:
+  - name: pyarmor-builder
+    image: pyarmor-builder:latest
+    imagePullPolicy: Never
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: pyarmor-license
+      mountPath: /root/.pyarmor
+      readOnly: true
+    - name: input-data
+      mountPath: /input
+    - name: output-data
+      mountPath: /output
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do sleep 30; done"]
+  volumes:
+  - name: pyarmor-license
+    secret:
+      secretName: pyarmor-license
+  - name: input-data
+    hostPath:
+      path: /data/input
+      type: DirectoryOrCreate
+  - name: output-data
+    hostPath:
+      path: /data/output
+      type: DirectoryOrCreate
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+      type: Socket
+  restartPolicy: Always
